@@ -115,7 +115,7 @@ def controller_loop():
             print(f"Enqueueing {uri}")
             queue_next(uri)
 
-        case _*:
+        case _:
             print("Unknown command")
 
     return True
