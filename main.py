@@ -12,6 +12,7 @@ refresh_token = ""
 token_time = 0
 playlist_id = ""
 device_id = ""
+queue_id = ""
 
 
 class RequestHandler(BaseHTTPRequestHandler):    
@@ -56,18 +57,52 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.server.shutdown()
         
         elif parsed_path.path == '/playlist_id':
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('id', playlist_id)
-            self.end_headers()
-            self.wfile.write(json.dumps({'id': playlist_id}).encode('utf-8'))
+            if playlist_id:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('id', playlist_id)
+                self.end_headers()
+                self.wfile.write(json.dumps({'id': playlist_id}).encode('utf-8'))
+            else:
+                self.send_response(204)
+                self.text_response("No playlist_id set")
 
         elif parsed_path.path == '/device_id':
+            if device_id:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('id', device_id)
+                self.end_headers()
+                self.wfile.write(json.dumps({'id': device_id}).encode('utf-8'))
+            else:
+                self.send_response(204)
+                self.text_response("No device_id set")
+
+        elif parsed_path.path == '/queue_id':
+            if queue_id:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('id', queue_id)
+                self.end_headers()
+                self.wfile.write(json.dumps({'id': queue_id}).encode('utf-8'))
+            else:
+                self.send_response(204)
+                self.text_response("No queue_id set")
+
+        elif parsed_path.path == '/info':
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
-            self.send_header('id', device_id)
+            self.send_header('qid', queue_id)
+            self.send_header('did', device_id)
+            self.send_header('pid', playlist_id)
+            self.send_header('token', access_token)
             self.end_headers()
-            self.wfile.write(json.dumps({'id': device_id}).encode('utf-8'))
+            self.wfile.write(json.dumps({
+                'qid': queue_id,
+                'did': device_id,
+                'pid': playlist_id,
+                'token': access_token
+            }).encode('utf-8'))
 
         else:
             self.send_response(404)
@@ -88,12 +123,24 @@ class RequestHandler(BaseHTTPRequestHandler):
             else:
                 self.send_response(400, message="No id given")
                 self.text_response("No playlist id given")
+
         elif self.path == '/device_id':
-            if id := parsed_data.get('id', [""])[0]:
+            if did := parsed_data.get('id', [""])[0]:
                 self.send_response(200)
                 global device_id
-                device_id = id
-                self.text_response(f"Set device id to: id")
+                device_id = did
+                self.text_response(f"Set device id to: {did}")
+            
+            else:
+                self.send_response(400, message="No id given")
+                self.text_response("No device id given")
+
+        elif self.path == '/queue_id':
+            if qid := parsed_data.get('id', [""])[0]:
+                self.send_response(200)
+                global queue_id
+                queue_id = qid
+                self.text_response(f"Set queue id to: {qid}")
             
             else:
                 self.send_response(400, message="No id given")

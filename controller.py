@@ -1,4 +1,5 @@
-from player import get_device_id, access_token
+from player import get_device_id, access_token, get_queue_id, get_playlist_tracks, \
+    remove_tracks_from_playlist, get_playback_state, set_playlist_id
 from structs import Track
 import requests
 
@@ -14,14 +15,15 @@ def skip():
 
 
 def pause():
+    # Doesn't currently work, since player_loop doesn't respect the pause
     url = f"https://api.spotify.com/v1/me/player/pause?device_id={get_device_id()}"
     headers = {
         'Authorization': "Bearer " + access_token()
     }
-    response = requests.post(url, headers=headers)
+    response = requests.put(url, headers=headers)
 
     if response.status_code != 204:
-        print("Pause failed") 
+        print(f"Pause failed: {response.reason}") 
 
 
 def resume():
@@ -29,7 +31,7 @@ def resume():
     headers = {
         'Authorization': "Bearer " + access_token()
     }
-    response = requests.post(url, headers=headers)
+    response = requests.put(url, headers=headers)
 
     if response.status_code != 204:
         print("Resume failed") 
@@ -60,21 +62,61 @@ def get_current_track_queue():
     return cur, queue
 
 
+def remove_current_track():
+    state = get_playback_state()
+    if item := state.get('item'):
+        cur_track = Track(item['name'], item['uri'])
+        remove_tracks_from_playlist(get_queue_id(), [cur_track])
+
+
+def queue_next(uri):
+    url = f"https://api.spotify.com/v1/playlists/{get_queue_id()}/tracks"
+
+    headers = {
+        'Authorization': "Bearer " + access_token(),
+        'Content-Type': 'application/json'
+    }
+    fields = {
+        'uris': [uri],
+        'position': 0
+    }
+    response = requests.post(url, headers=headers, json=fields)
+    if response.status_code != 201:
+        print("Queueing next track failed")
+        raise Exception
+
+
 def controller_loop():
     com = input("Enter command:\n> ")
-    match com:
-        case "skip":
+    match com.split():
+        case "skip", :
+            print("skipping")
+            remove_current_track()
             skip()
-        case "print queue":
-            cur, queue = get_current_track_queue()
-            print (f"Currently Playing:\n\t0: {cur.name},  uri:{cur.uri}")
+
+        case "print", "queue":
+            queue = get_playlist_tracks(get_queue_id())
             print("Queue:")
             for i, track in enumerate(queue):
-                print(f"\t{i+1}: {track.name},  uri:{track.uri}")
-        case "exit":
+                print(f"\t{i+1}: {track.name},  uri: {track.uri}")
+
+        case "exit", :
+            print("closing down")
             return False
-        case "pause":
-            pause()
+        
+        case "remove", uri:
+            print(f"Removing: {uri}")
+            remove_tracks_from_playlist(get_queue_id(), [Track("placeholder", uri)])
+
+        case "playlist", :
+            set_playlist_id()
+
+        case "queue", uri:
+            print(f"Enqueueing {uri}")
+            queue_next(uri)
+
+        case _*:
+            print("Unknown command")
 
     return True
 
@@ -82,3 +124,4 @@ def controller_loop():
 if __name__ == '__main__':
     while controller_loop():
         pass
+
