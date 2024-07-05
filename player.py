@@ -5,9 +5,11 @@ from enum import IntEnum
 from random import shuffle
 import conf
 import requests
+import json
 
 
 track_status = {}
+backup = ""
 
 
 class Status(IntEnum):
@@ -257,6 +259,31 @@ def start_playback(qid=None, did=None, token=None):
         print("Starting playback failed")
 
 
+def choose_backup():
+    global backup
+    backup = input("Write name of storage file\n> ")
+    
+    try:
+        tracks = []
+        with open(backup, 'r') as f:
+            for line in f:
+                try:
+                    data = json.loads(line.strip())
+                    tracks.append(Track(**data))
+                except Exception as e:
+                    print(f"Loading line \"{line}\", failed: {e}")
+        track_status = {t: Status.PLAYED for t in tracks}
+    except FileNotFoundError:
+        print("Creating new storage file")
+        open(backup, 'w')
+
+
+def write_to_backup(track):
+    with open(backup, 'a') as f:
+        json.dump(track.to_dict(), f)
+        f.write("\n")
+
+
 def player_loop():
     global track_status
     while True:
@@ -270,7 +297,9 @@ def player_loop():
         state = get_playback_state(token=token)
         if item := state.get('item'):
             cur_track = Track(item['name'], item['uri'])
-            track_status[cur_track] = max(track_status.get(cur_track, Status.NEW), Status.PLAYED)
+            if track_status.get(cur_track, Status.NEW) < Status.PLAYED:
+                track_status[cur_track] = Status.PLAYED
+                write_to_backup(cur_track)
 
         played = [track for track in queue if track_status.get(track, Status.QUEUED) >= Status.PLAYED and track.name != conf.default_track_name]
         if played:
@@ -305,6 +334,7 @@ def player_loop():
 
 
 if __name__ == '__main__':
+    choose_backup()
     print("Creating Queue")
     create_queue()
     print("Setting playlist id")

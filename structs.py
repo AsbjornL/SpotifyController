@@ -13,3 +13,9 @@ class Track:
     def __hash__(self):
         return hash(self.name)
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'uri': self.uri
+        }
+

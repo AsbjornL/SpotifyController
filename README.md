@@ -47,8 +47,6 @@ To stop the controller
 
 - Check that refreshing access tokens work
 
-- Add backup for `track_status`, so you can resume an earlier listening session
-
 - Test in a live setting
 
 - Add pausing to controller
