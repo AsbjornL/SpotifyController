@@ -45,8 +45,6 @@ To stop the controller
 
 ## Todo
 
-- Check that refreshing access tokens work
-
 - Test in a live setting
 
 - Add pausing to controller

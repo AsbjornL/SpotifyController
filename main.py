@@ -163,12 +163,12 @@ def refresh_access_token():
 
     if response.status_code != 200:
         print(f"Refreshing access token failed: {response.reason}")
+        print(response.text)
         raise Exception
     else:
         res_json = response.json()
         global access_token
         access_token = res_json.get("access_token")
-        refresh_token = res_json.get("refresh_token")
         global token_time
         token_time = time() 
 
