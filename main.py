@@ -90,6 +90,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.text_response("No queue_id set")
 
         elif parsed_path.path == '/info':
+             if time() - token_time >= conf.token_lifetime:
+                refresh_access_token()
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('qid', queue_id)
@@ -148,6 +150,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 
 def refresh_access_token():
+    print("Refreshing access token")
     global refresh_token
     url = "https://accounts.spotify.com/api/token"
     fields = {

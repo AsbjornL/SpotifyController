@@ -86,6 +86,19 @@ def queue_next(uri):
         raise Exception
 
 
+def actual_queue(uri):
+    url = f"https://api.spotify.com/v1/me/player/queue?device_id={get_device_id()}"
+    url += f"&uri={uri}"
+    headers = {
+        'Authorization': "Bearer " + access_token(),
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.post(url, headers=headers)
+    if response.status_code != 204:
+        print("Adding to actual queue failed")
+
+
 def controller_loop():
     com = input("Enter command:\n> ")
     match com.split():
@@ -114,6 +127,10 @@ def controller_loop():
         case "queue", uri:
             print(f"Enqueueing {uri}")
             queue_next(uri)
+
+        case "force", "queue", uri:
+            print(f"Force enqueueing {uri}")
+            actual_queue(uri)
 
         case _:
             print("Unknown command")

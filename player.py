@@ -272,6 +272,7 @@ def choose_backup():
                     tracks.append(Track(**data))
                 except Exception as e:
                     print(f"Loading line \"{line}\", failed: {e}")
+        global track_status
         track_status = {t: Status.PLAYED for t in tracks}
     except FileNotFoundError:
         print("Creating new storage file")
@@ -309,7 +310,9 @@ def player_loop():
             # Just in case
             track_status[track] = max(track_status.get(track, Status.QUEUED), Status.QUEUED)
 
-        if len(queue) < conf.queue_size:
+        has_default = any(t.name == conf.default_track_name for t in queue)
+
+        if len(queue) < conf.queue_size or has_default:
             print(f"Queue length is {len(queue)}. Adding track")
             candidates = get_playlist_tracks(playlist_id, token=token)
             shuffle(candidates)
@@ -322,7 +325,12 @@ def player_loop():
                 print(f"No more songs in playlist. Adding {conf.default_track_name}")
                 next_track = Track(conf.default_track_name, conf.default_track_uri)
 
-            add_tracks_to_queue([next_track], qid=queue_id, token=token)
+            if len(queue) < conf.queue_size or next_track.name != conf.default_track_name:
+                add_tracks_to_queue([next_track], qid=queue_id, token=token)
+
+            if next_track.name != conf.default_track_name and has_default:
+                # A new song. Clear out all defaults
+                remove_tracks_from_playlist(queue_id, [Track(conf.default_track_name, conf.default_track_uri)], token=token)
 
         if not state['is_playing']:
             start_playback(qid=queue_id, did=device_id, token=token)
@@ -330,7 +338,7 @@ def player_loop():
         elif state['device']['id'] != device_id:
             set_device_id(state['device']['id'])
 
-        sleep(5)
+        sleep(3)
 
 
 if __name__ == '__main__':
