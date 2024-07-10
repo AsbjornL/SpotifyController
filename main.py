@@ -148,7 +148,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 
 def refresh_access_token():
-    global refresh_token
+    print("Refreshing access token")
     url = "https://accounts.spotify.com/api/token"
     fields = {
         'grant_type': "refresh_token",

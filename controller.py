@@ -30,7 +30,7 @@ def skip():
     }
     response = requests.post(url, headers=headers)
 
-    if response.status_code not in {200, 204}:
+    if response.status_code not in (200, 204):
         print(f"Skip failed: {response.reason}")
 
 
@@ -55,31 +55,6 @@ def resume():
 
     if response.status_code != 204:
         print("Resume failed") 
-
-
-def get_current_track_queue():
-    url = "https://api.spotify.com/v1/me/player/queue"
-    headers = {
-        'Authorization': "Bearer " + access_token()
-    }
-    response = requests.get(url, headers=headers)
-
-    if response.status_code != 200:
-        print("Get current track and queue failed")
-        raise Exception
-
-    res_json = response.json()
-    cur = None
-    if currently_playing := res_json['currently_playing']:
-        cur = Track(currently_playing['name'], currently_playing['uri'])
-
-    queue = []
-    for tune in res_json['queue']:
-        if Track(tune['name'], None) in queue:
-            continue
-        queue.append(Track(tune['name'], tune['uri']))
-
-    return cur, queue
 
 
 def remove_current_track():
