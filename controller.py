@@ -1,7 +1,27 @@
 from player import get_device_id, access_token, get_queue_id, get_playlist_tracks, \
-    remove_tracks_from_playlist, get_playback_state, set_playlist_id
+    remove_tracks_from_playlist, get_playback_state
 from structs import Track
 import requests
+
+
+def set_playlist_id(token=None):
+    token = token or access_token()
+
+    pid = input("Enter playlist id:\n> ")
+
+    if get_playlist_tracks(pid, token=token):
+        url = conf.url + "/set_playlist"
+        fields = {
+            'id': pid
+        }
+        response = requests.post(url, data=fields)
+        if (response.status_code != 200):
+            print("Setting playlist id failed")
+
+    else:
+        print("Playlist didn't have any tracks. Trying again")
+        set_playlist_id(token=token)
+
 
 def skip():
     url = f"https://api.spotify.com/v1/me/player/next?device_id={get_device_id()}"
@@ -10,8 +30,8 @@ def skip():
     }
     response = requests.post(url, headers=headers)
 
-    if response.status_code != 204:
-        print("Skip failed")
+    if response.status_code not in {200, 204}:
+        print(f"Skip failed: {response.reason}")
 
 
 def pause():

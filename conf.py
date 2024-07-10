@@ -8,8 +8,10 @@ scope = "user-modify-playback-state user-read-currently-playing user-read-playba
 
 token_lifetime = 3000
 
-queue_size = 3
+queue_size = 5
+player_loop_time = 10
 
 default_track_name = "Fireball (feat. John Ryan)"
 default_track_uri = "spotify:track:4Y7XAxTANhu3lmnLAzhWJW"
 
+default_playlist_id = "5zFi8YZomeTAbBFfN0Ib4O"
