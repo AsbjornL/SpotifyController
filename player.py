@@ -79,7 +79,7 @@ def get_playlist_tracks(playlist_id, token=None):
 def set_playlist_id(token=None):
     token = token or access_token()
 
-    pid = input("Enter playlist id:\n> ")
+    pid = conf.default_playlist_id
 
     if get_playlist_tracks(pid, token=token):
         url = conf.url + "/set_playlist"
@@ -91,8 +91,8 @@ def set_playlist_id(token=None):
             print("Setting playlist id failed")
 
     else:
-        print("Playlist didn't have any tracks. Trying again")
-        set_playlist_id(token=token)
+        print("Default playlist didn't have any tracks")
+        raise Exception
 
 
 def set_device_id(device_id):
@@ -259,6 +259,21 @@ def start_playback(qid=None, did=None, token=None):
         print("Starting playback failed")
 
 
+def toggle_shuffle(token=None, did=None):
+    token = token or access_token()
+    did = did or get_device_id()
+
+    url = f"https://api.spotify.com/v1/me/player/shuffle?state=false&device_id={did}"
+
+    headers = {
+        'Authorization': "Bearer " + token
+    }
+
+    response = requests.put(url, headers=headers)
+    if response.status_code != 204:
+        print("Toggle shuffle failed")
+
+
 def choose_backup():
     global backup
     backup = input("Write name of storage file\n> ")
@@ -338,7 +353,7 @@ def player_loop():
         elif state['device']['id'] != device_id:
             set_device_id(state['device']['id'])
 
-        sleep(3)
+        sleep(conf.player_loop_time)
 
 
 if __name__ == '__main__':
@@ -351,6 +366,8 @@ if __name__ == '__main__':
     choose_device_id()
     print("Starting playback")
     start_playback()
+    print("Toggling shuffle off")
+    toggle_shuffle()
     print("Starting player loop")
     player_loop()
 

@@ -10,10 +10,11 @@ This will open a server that will connect the different components, and handle a
 
 Next run `autherize.py`.
 This will open a Spotify authorization tab in your browser, asking for permissions.
+You can close this, once it says "Code: <access code>"
 
 Now run `player.py`.
-This will start the playing session, by asking you for a playlist to take songs from, and a device to play from.
-It will continuously add tracks to a "queue" (it is actually a playlist) that it plays from, ensuring no song is added more than once.
+This will start the playing session, by asking you for a device to play from.
+It will continuously add tracks to a "queue" (that is actually a playlist) that it plays from, ensuring no song is added more than once.
 Songs are said to be the same, if their name is an exact match.
 
 If you run `controller.py`, you'll be able to control the playback.
@@ -44,8 +45,6 @@ To stop the controller
 ```> exit```
 
 ## Todo
-
-- Check that refreshing access tokens work
 
 - Test in a live setting
 
