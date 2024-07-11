@@ -270,8 +270,8 @@ def toggle_shuffle(token=None, did=None):
     }
 
     response = requests.put(url, headers=headers)
-    if response.status_code != 204:
-        print("Toggle shuffle failed")
+    if response.status_code not in {200, 204}:
+        print(f"Toggle shuffle failed, {response.reason}")
 
 
 def choose_backup():
@@ -300,9 +300,24 @@ def write_to_backup(track):
         f.write("\n")
 
 
+def is_paused():
+    url = conf.url + "/paused"
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        print("Get paused status failed")
+        return False
+
+    return response.json()['paused']
+
+
 def player_loop():
     global track_status
     while True:
+        if is_paused():
+            sleep(conf.player_loop_time)
+            continue
+
         info = get_token_and_ids()
         queue_id = info['qid']
         device_id = info['did']

@@ -14,6 +14,8 @@ playlist_id = ""
 device_id = ""
 queue_id = ""
 
+paused = False
+
 
 class RequestHandler(BaseHTTPRequestHandler):    
     def text_response(self, text):
@@ -90,7 +92,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.text_response("No queue_id set")
 
         elif parsed_path.path == '/info':
-             if time() - token_time >= conf.token_lifetime:
+            if time() - token_time >= conf.token_lifetime:
                 refresh_access_token()
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
@@ -104,6 +106,15 @@ class RequestHandler(BaseHTTPRequestHandler):
                 'did': device_id,
                 'pid': playlist_id,
                 'token': access_token
+            }).encode('utf-8'))
+
+        elif parsed_path.path == '/paused':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('paused', paused)
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                'paused': paused,
             }).encode('utf-8'))
 
         else:
@@ -147,6 +158,18 @@ class RequestHandler(BaseHTTPRequestHandler):
             else:
                 self.send_response(400, message="No id given")
                 self.text_response("No device id given")
+
+    def do_PUT(self):
+        global paused
+        if self.path == '/pause':
+            self.send_response(200)
+            self.text_response("Paused")
+            paused = True
+
+        elif self.path == '/resume':
+            self.send_response(200)
+            self.text_response("Resuming")
+            paused = False
 
 
 def refresh_access_token():

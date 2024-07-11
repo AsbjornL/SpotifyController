@@ -48,5 +48,3 @@ To stop the controller
 
 - Test in a live setting
 
-- Add pausing to controller
-

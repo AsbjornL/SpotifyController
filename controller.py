@@ -2,6 +2,7 @@ from player import get_device_id, access_token, get_queue_id, get_playlist_track
     remove_tracks_from_playlist, get_playback_state
 from structs import Track
 import requests
+import conf
 
 
 def set_playlist_id(token=None):
@@ -42,8 +43,14 @@ def pause():
     }
     response = requests.put(url, headers=headers)
 
-    if response.status_code != 204:
-        print(f"Pause failed: {response.reason}") 
+    if response.status_code not in {200, 204}:
+        print(f"Pause failed on Spotify: {response.reason}") 
+
+    url = conf.url + "/pause"
+    response = requests.put(url)
+
+    if response.status_code != 200:
+        print("Pause failed on local")
 
 
 def resume():
@@ -53,8 +60,15 @@ def resume():
     }
     response = requests.put(url, headers=headers)
 
-    if response.status_code != 204:
-        print("Resume failed") 
+    if response.status_code not in {200, 204}:
+        print("Resume failed on Spotify") 
+
+    url = conf.url + "/resume"
+    response = requests.put(url)
+
+    if response.status_code != 200:
+        print("Resume failed on local")
+
 
 
 def remove_current_track():
@@ -126,6 +140,14 @@ def controller_loop():
         case "force", "queue", uri:
             print(f"Force enqueueing {uri}")
             actual_queue(uri)
+
+        case "pause", :
+            print(f"Pausing playback")
+            pause()
+
+        case "resume", :
+            print(f"Resuming playback")
+            resume()
 
         case _:
             print("Unknown command")
