@@ -48,3 +48,7 @@ To stop the controller
 
 - Test in a live setting
 
+- Make it easier to remove queued tracks
+
+- Consider a better default behaviour, than playing Fireball on repeat
+
