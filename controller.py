@@ -108,6 +108,22 @@ def actual_queue(uri):
         print("Adding to actual queue failed")
 
 
+def stop_server():
+    url = conf.url + "/stop"
+    response = requests.put(url)
+i
+    if resonse.status_code != 200:
+        print("Stopping server failed")
+
+
+def stop_player():
+    url = conf.url + "/stop-player"
+    response = requests.put(url)
+
+    if response.status_code != 200:
+        print("Stopping player failed")
+
+
 def controller_loop():
     com = input("Enter command:\n> ")
     match com.split():
@@ -125,7 +141,15 @@ def controller_loop():
         case "exit", :
             print("closing down")
             return False
-        
+
+        case "stop", "player":
+            print("Stopping player")
+            stop_player()
+
+        case "stop", "server":
+            print("Stopping server")
+            stop_server()
+
         case "remove", uri:
             print(f"Removing: {uri}")
             remove_tracks_from_playlist(get_queue_id(), [Track("placeholder", uri)])

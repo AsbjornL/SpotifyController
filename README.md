@@ -48,3 +48,7 @@ To stop the controller
 
 - Test in a live setting
 
+- Consider better default behaviour, than just playing Fireball on repeat.
+
+- Add gracefull stopping of system.
+
