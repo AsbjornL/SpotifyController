@@ -323,8 +323,6 @@ def player_loop():
         device_id = info['did']
         playlist_id = info['pid']
         token = info['token']
-        if info['stop']:
-            break
         queue = get_playlist_tracks(queue_id, token=token)
 
         state = get_playback_state(token=token)
@@ -387,5 +385,4 @@ if __name__ == '__main__':
     toggle_shuffle()
     print("Starting player loop")
     player_loop()
-    print("Stopping player")
 

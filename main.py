@@ -15,7 +15,7 @@ device_id = ""
 queue_id = ""
 
 paused = False
-stop_player = False
+
 
 class RequestHandler(BaseHTTPRequestHandler):    
     def text_response(self, text):
@@ -43,7 +43,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.send_response(400, message="No code given")
                 self.text_response("Request received, but no code given")
                 print("/login: Request received, but no code given")
-
+        
         elif parsed_path.path == '/token':
             if time() - token_time >= conf.token_lifetime:
                 refresh_access_token()
@@ -53,7 +53,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({'token': access_token}).encode('utf-8'))
 
-       elif parsed_path.path == '/playlist_id':
+        elif parsed_path.path == '/stop':
+            self.send_response(200)
+            print("Shutting down")
+            self.server.shutdown()
+        
+        elif parsed_path.path == '/playlist_id':
             if playlist_id:
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -95,14 +100,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('did', device_id)
             self.send_header('pid', playlist_id)
             self.send_header('token', access_token)
-            self.send_header('stop', stop_player)
             self.end_headers()
             self.wfile.write(json.dumps({
                 'qid': queue_id,
                 'did': device_id,
                 'pid': playlist_id,
-                'token': access_token,
-                'stop': stop_player
+                'token': access_token
             }).encode('utf-8'))
 
         elif parsed_path.path == '/paused':
@@ -129,7 +132,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 global playlist_id
                 playlist_id = id
                 self.text_response(f"Set playlist id to: id")
-
+            
             else:
                 self.send_response(400, message="No id given")
                 self.text_response("No playlist id given")
@@ -140,7 +143,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 global device_id
                 device_id = did
                 self.text_response(f"Set device id to: {did}")
-
+            
             else:
                 self.send_response(400, message="No id given")
                 self.text_response("No device id given")
@@ -151,7 +154,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 global queue_id
                 queue_id = qid
                 self.text_response(f"Set queue id to: {qid}")
-
+            
             else:
                 self.send_response(400, message="No id given")
                 self.text_response("No device id given")
@@ -168,15 +171,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.text_response("Resuming")
             paused = False
 
-        elif self.path == '/stop':
-            self.send_response(200)
-            print("Shutting down")
-            self.server.shutdown()
-
-        elif self.path == '/stop-player':
-            self.send_response(200)
-            global stop_player
-            stop_player = True
 
 def refresh_access_token():
     print("Refreshing access token")
