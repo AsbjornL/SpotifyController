@@ -371,7 +371,7 @@ def player_loop():
         sleep(conf.player_loop_time)
 
 
-if __name__ == '__main__':
+def run_player():
     choose_backup()
     print("Creating Queue")
     create_queue()
@@ -386,3 +386,6 @@ if __name__ == '__main__':
     print("Starting player loop")
     player_loop()
 
+
+if __name__ == '__main__':
+    run_player()
