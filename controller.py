@@ -5,6 +5,9 @@ import requests
 import conf
 
 
+prev_queue = {}
+
+
 def set_playlist_id(token=None):
     token = token or access_token()
 
@@ -120,13 +123,22 @@ def controller_loop():
             queue = get_playlist_tracks(get_queue_id())
             print("Queue:")
             for i, track in enumerate(queue):
+                prev_queue[i+1] = track
                 print(f"\t{i+1}: {track.name},  uri: {track.uri}")
 
         case "exit", :
             print("closing down")
             return False
         
-        case "remove", uri:
+        case "remove", choice:
+            if choice.isdigit():
+                if track := prev_queue.get(int(choice)):
+                    uri = track.uri
+                else:
+                    print("No track matching number given")
+                    return True
+            else:
+                uri = choise
             print(f"Removing: {uri}")
             remove_tracks_from_playlist(get_queue_id(), [Track("placeholder", uri)])
 
