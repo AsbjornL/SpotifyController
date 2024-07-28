@@ -2,6 +2,7 @@ from flask import Flask, redirect, request, render_template, url_for
 from waitress import serve
 from autherize import auth_url
 from player import access_token, set_device_id, load_backup, set_playlist_id, create_queue, start_playback, toggle_shuffle, player_loop
+from controller import stop_player
 import requests
 import conf
 
@@ -70,10 +71,25 @@ def start_playing():
 
         start_playback()
         toggle_shuffle()
-        player_loop()
-        return f"Device {device_id} selected successfully!"
+
+
+        thread = threading.Thread(target=player_loop())
+        thread.start()
+
+        return redirect(url_for('control_playback'), code=302)
 
     return render_template('choose_device.html', devices=devices, enumerate=enumerate)
+
+
+@app.route("/control_playback", methods=['GET']):
+def control_playback():
+    return render_template('control_playback.html')
+
+
+@app.route("/stop_playback", methods=['POST']):
+def stop_playback():
+    stop_player()
+    return "Playback stopped successfully"
 
 
 if __name__ == '__main__':
