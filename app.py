@@ -3,6 +3,7 @@ from waitress import serve
 from autherize import auth_url
 from player import access_token, set_device_id, load_backup, set_playlist_id, create_queue, start_playback, toggle_shuffle, player_loop
 import requests
+import conf
 
 
 app = Flask(__name__)
@@ -15,16 +16,32 @@ def clear_backup():
 
 @app.route("/")
 def start():
-    return redirect(url_for('authorize'))
+    return redirect(url_for('auth'), code=302)
 
 
-@app.route("/autherize")
+@app.route("/auth")
 def auth():
-    return redirect(auth_url(url_for('start_playback')), code=302)
+    return redirect(auth_url(url_for("receive_code")), code=302)
+
+
+@app.route("/receive_code")
+def receive_code():
+    code = request.args.get('code')
+
+    if code:
+        response = requests.get(conf.url + '/login')
+
+        if response.status_code != 200:
+            return "Contacting main server failed", 400
+
+        return redirect(url_for("start_playback"), code=302)
+
+    else:
+        return "Code parameter missing", 400
 
 
 @app.route("/start_playback", methods=['GET', 'POST'])
-def choose_device():
+def start_playback():
     token = access_token()
 
     url = "https://api.spotify.com/v1/me/player/devices"
