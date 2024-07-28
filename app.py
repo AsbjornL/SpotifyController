@@ -5,6 +5,7 @@ from player import access_token, set_device_id, load_backup, set_playlist_id, cr
 from controller import stop_player
 import requests
 import conf
+import threading
 
 
 app = Flask(__name__)
@@ -73,7 +74,7 @@ def start_playing():
         toggle_shuffle()
 
 
-        thread = threading.Thread(target=player_loop())
+        thread = threading.Thread(target=player_loop)
         thread.start()
 
         return redirect(url_for('control_playback'), code=302)
@@ -81,12 +82,12 @@ def start_playing():
     return render_template('choose_device.html', devices=devices, enumerate=enumerate)
 
 
-@app.route("/control_playback", methods=['GET']):
+@app.route("/control_playback", methods=['GET'])
 def control_playback():
     return render_template('control_playback.html')
 
 
-@app.route("/stop_playback", methods=['POST']):
+@app.route("/stop_playback", methods=['POST'])
 def stop_playback():
     stop_player()
     return "Playback stopped successfully"
