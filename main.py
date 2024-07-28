@@ -189,7 +189,6 @@ def refresh_access_token():
 
     if response.status_code != 200:
         print(f"Refreshing access token failed: {response.reason}")
-        print(response.text)
         raise Exception
     else:
         res_json = response.json()
@@ -204,7 +203,7 @@ def get_access_token(code):
     fields = {
         'grant_type': "authorization_code",
         'code': code,
-        'redirect_uri': conf.url + "/login"
+        'redirect_uri': conf.redirect_uri
     }
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",

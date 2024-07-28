@@ -21,7 +21,7 @@ def start():
 
 @app.route("/auth")
 def auth():
-    return redirect(auth_url(f"{conf.server_ip}:5000/receive_code"), code=302)
+    return redirect(auth_url(), code=302)
 
 
 @app.route("/receive_code")
@@ -29,19 +29,19 @@ def receive_code():
     code = request.args.get('code')
 
     if code:
-        response = requests.get(conf.url + '/login')
+        response = requests.get(f"{conf.url}/login?code={code}")
 
         if response.status_code != 200:
             return "Contacting main server failed", 400
 
-        return redirect(url_for("start_playback"), code=302)
+        return redirect(url_for("start_playing"), code=302)
 
     else:
         return "Code parameter missing", 400
 
 
-@app.route("/start_playback", methods=['GET', 'POST'])
-def start_playback():
+@app.route("/start_playing", methods=['GET', 'POST'])
+def start_playing():
     token = access_token()
 
     url = "https://api.spotify.com/v1/me/player/devices"
@@ -73,7 +73,7 @@ def start_playback():
         player_loop()
         return f"Device {device_id} selected successfully!"
 
-    return render_template('choose_device.html', devices=devices)
+    return render_template('choose_device.html', devices=devices, enumerate=enumerate)
 
 
 if __name__ == '__main__':

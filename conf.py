@@ -1,6 +1,7 @@
 port = 7000
 server_ip = "insert_ip_here"
 url = f"http://{server_ip}:{port}"
+redirect_uri = url + "/login"
 
 client_id = "16d4bd814f104e29a21c61f7cb9c022b"
 client_secret = "InsertSecretHere"
