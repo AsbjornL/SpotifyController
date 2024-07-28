@@ -15,6 +15,7 @@ device_id = ""
 queue_id = ""
 
 paused = False
+stop_playback = False
 
 
 class RequestHandler(BaseHTTPRequestHandler):    
@@ -100,12 +101,14 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header('did', device_id)
             self.send_header('pid', playlist_id)
             self.send_header('token', access_token)
+            self.send_header('stop', stop_playback)
             self.end_headers()
             self.wfile.write(json.dumps({
                 'qid': queue_id,
                 'did': device_id,
                 'pid': playlist_id,
-                'token': access_token
+                'token': access_token,
+                'stop': stop_playback
             }).encode('utf-8'))
 
         elif parsed_path.path == '/paused':
@@ -161,6 +164,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def do_PUT(self):
         global paused
+        global stop_playback
         if self.path == '/pause':
             self.send_response(200)
             self.text_response("Paused")
@@ -170,6 +174,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.text_response("Resuming")
             paused = False
+
+        elif self.path == '/stop_player':
+            stop_playback = True
+            self.send_response(200)
+            self.text_response("Stopping player")
+
+        elif self.path == '/start_player':
+            stop_playback = False
+            self.send_response(200)
+            self.text_response("Player no longer stopped")
 
 
 def refresh_access_token():

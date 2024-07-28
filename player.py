@@ -240,6 +240,11 @@ def get_playback_state(token=None):
     raise Exception
 
 def start_playback(qid=None, did=None, token=None):
+    url = conf.url + "/start_player"
+    response = requests.put(url)
+    if response.status_code != 200:
+        print("Asking main server to start player failed")
+
     qid = qid or get_queue_id()
     did = did or get_device_id()
     token = token or access_token()
@@ -328,6 +333,9 @@ def player_loop():
         playlist_id = info['pid']
         token = info['token']
         queue = get_playlist_tracks(queue_id, token=token)
+        if info['stop']:
+            print("Player stopping")
+            break
 
         state = get_playback_state(token=token)
         if item := state.get('item'):

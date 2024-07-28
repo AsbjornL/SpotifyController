@@ -111,6 +111,14 @@ def actual_queue(uri):
         print("Adding to actual queue failed")
 
 
+def stop_player():
+    url = conf.url + "/stop_player"
+    response = requests.put(url)
+
+    if response.status_code != 200:
+        print("Asking server to stop player failed")
+
+
 def controller_loop():
     com = input("Enter command:\n> ")
     match com.split():
@@ -129,7 +137,11 @@ def controller_loop():
         case "exit", :
             print("closing down")
             return False
-        
+
+        case "stop", "player":
+            print("Stopping player")
+            stop_player()
+
         case "remove", choice:
             if choice.isdigit():
                 if track := prev_queue.get(int(choice)):
