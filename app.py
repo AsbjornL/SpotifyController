@@ -21,7 +21,7 @@ def start():
 
 @app.route("/auth")
 def auth():
-    return redirect(auth_url(url_for("receive_code")), code=302)
+    return redirect(auth_url(f"{conf.server_ip}:5000/receive_code"), code=302)
 
 
 @app.route("/receive_code")

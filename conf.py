@@ -1,5 +1,6 @@
 port = 7000
-url = f"http://localhost:{port}"
+server_ip = "insert_ip_here"
+url = f"http://{server_ip}:{port}"
 
 client_id = "16d4bd814f104e29a21c61f7cb9c022b"
 client_secret = "InsertSecretHere"
