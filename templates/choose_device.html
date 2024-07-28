@@ -1,0 +1,28 @@
+<!-- templates/choose_device.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Device</title>
+</head>
+<body>
+    <h1>Available Devices</h1>
+    <form method="POST">
+        <label>
+            <input type="checkbox" name="clear_cache" value="yes">
+            Clear Cache
+        </label>
+        <ul>
+            {% for i, device in enumerate(devices) %}
+                <li>
+                    <input type="radio" id="device{{ i }}" name="device_id" value="{{ device['id'] }}" required>
+                    <label for="device{{ i }}">{{ device['name'] }}</label>
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Choose Device</button>
+    </form>
+</body>
+</html>
+

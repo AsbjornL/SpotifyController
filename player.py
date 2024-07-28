@@ -275,12 +275,16 @@ def toggle_shuffle(token=None, did=None):
 
 
 def choose_backup():
+    choice = input("Write name of storage file\n> ")
+    load_backup(choice)
+
+
+def load_backup(file_name):
     global backup
-    backup = input("Write name of storage file\n> ")
-    
+    backup = file_name
     try:
         tracks = []
-        with open(backup, 'r') as f:
+        with open(file_name, 'r') as f:
             for line in f:
                 try:
                     data = json.loads(line.strip())
@@ -371,7 +375,7 @@ def player_loop():
         sleep(conf.player_loop_time)
 
 
-def run_player():
+if __name__ == '__main__':
     choose_backup()
     print("Creating Queue")
     create_queue()
@@ -386,6 +390,3 @@ def run_player():
     print("Starting player loop")
     player_loop()
 
-
-if __name__ == '__main__':
-    run_player()
