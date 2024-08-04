@@ -150,7 +150,7 @@ def controller_loop():
                     print("No track matching number given")
                     return True
             else:
-                uri = choise
+                uri = choice
             print(f"Removing: {uri}")
             remove_tracks_from_playlist(get_queue_id(), [Track("placeholder", uri)])
 
