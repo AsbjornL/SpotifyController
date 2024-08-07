@@ -162,6 +162,11 @@ def get_user_id(token=None):
 def create_queue(token=None):
     token = token or access_token()
 
+    if qid := get_queue_id():
+        ans = input("Queue playlist already exists. Reuse? (y/n)\n>")
+        if ans in {"y", "Y"}:
+            return
+
     name = "API queue " + str(date.today())
     url = f"https://api.spotify.com/v1/users/{get_user_id(token=token)}/playlists"
     headers = {
@@ -298,6 +303,7 @@ def load_backup(file_name):
                     print(f"Loading line \"{line}\", failed: {e}")
         global track_status
         track_status = {t: Status.PLAYED for t in tracks}
+        print(f"{len(track_status)} played tracks loaded from backup")
     except FileNotFoundError:
         print("Creating new storage file")
         open(backup, 'w')
@@ -323,6 +329,7 @@ def is_paused():
 def player_loop():
     global track_status
     while True:
+        print("Loopin'")
         if is_paused():
             sleep(conf.player_loop_time)
             continue

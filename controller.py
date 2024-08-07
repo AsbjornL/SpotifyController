@@ -107,7 +107,7 @@ def actual_queue(uri):
     }
 
     response = requests.post(url, headers=headers)
-    if response.status_code != 204:
+    if response.status_code not in {200, 204}:
         print("Adding to actual queue failed")
 
 

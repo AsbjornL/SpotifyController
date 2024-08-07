@@ -52,3 +52,4 @@ To stop the controller
 
 - Consider a better default behaviour, than playing Fireball on repeat
 
+- Add exponential retry behaviour
