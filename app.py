@@ -23,7 +23,7 @@ def start():
 
 @app.route("/auth")
 def auth():
-    return redirect(auth_url(), code=302)
+    return redirect(auth_url(conf.webapp_redirect), code=302)
 
 
 @app.route("/receive_code")
