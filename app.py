@@ -31,7 +31,7 @@ def receive_code():
     code = request.args.get('code')
 
     if code:
-        response = requests.get(f"{conf.url}/login?code={code}")
+        response = requests.get(f"{conf.url}/login?code={code}&webapp=True")
 
         if response.status_code != 200:
             return "Contacting main server failed", 400

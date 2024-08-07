@@ -40,7 +40,12 @@ def get_device_id():
 def get_queue_id():
     url = conf.url + "/queue_id"
     response = requests.get(url)
-    return response.json()['id']
+    if response.status_code == 200:
+        return response.json()['id']
+    elif response.status_code == 204:
+        return ""
+    else:
+        raise Exception
 
 
 def get_token_and_ids():
