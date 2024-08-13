@@ -33,12 +33,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.text_response("Hello World")
 
         elif parsed_path.path == '/login':
+            from_webapp = True if params.get('webapp', [False])[0] else False
             if code := params.get('code', [''])[0]:
                 m = f"code received: {code}"
                 self.send_response(200, message=m)
                 self.text_response(m)
 
-                get_access_token(code)
+                get_access_token(code, from_webapp)
 
             else:
                 self.send_response(400, message="No code given")
@@ -203,6 +204,7 @@ def refresh_access_token():
 
     if response.status_code != 200:
         print(f"Refreshing access token failed: {response.reason}")
+        print(response.text)
         raise Exception
     else:
         res_json = response.json()
@@ -212,12 +214,12 @@ def refresh_access_token():
         token_time = time() 
 
 
-def get_access_token(code):
+def get_access_token(code, from_webapp):
     url = "https://accounts.spotify.com/api/token"
     fields = {
         'grant_type': "authorization_code",
         'code': code,
-        'redirect_uri': conf.redirect_uri
+        'redirect_uri': conf.webapp_redirect if from_webapp else conf.redirect_uri
     }
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
