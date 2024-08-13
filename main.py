@@ -190,6 +190,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 def refresh_access_token():
     print("Refreshing access token")
     global refresh_token
+    if not refresh_token:
+        print("Trying the refresh without a refresh token")
+        return
+
     url = "https://accounts.spotify.com/api/token"
     fields = {
         'grant_type': "refresh_token",
