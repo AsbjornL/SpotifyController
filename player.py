@@ -167,11 +167,6 @@ def get_user_id(token=None):
 def create_queue(token=None):
     token = token or access_token()
 
-    if qid := get_queue_id():
-        ans = input("Queue playlist already exists. Reuse? (y/n)\n>")
-        if ans in {"y", "Y"}:
-            return
-
     name = "API queue " + str(date.today())
     url = f"https://api.spotify.com/v1/users/{get_user_id(token=token)}/playlists"
     headers = {
