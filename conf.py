@@ -15,6 +15,8 @@ token_lifetime = 3500
 queue_size = 5
 # In seconds. Should be lower than the average length of a song
 player_loop_time = 10
+# The number of times a track needs to be seen in the queue, before it is removed
+max_track_count = queue_size * 300 // player_loop_time
 
 default_track_name = "Fireball (feat. John Ryan)"
 default_track_uri = "spotify:track:4Y7XAxTANhu3lmnLAzhWJW"

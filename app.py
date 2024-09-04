@@ -13,86 +13,86 @@ BACKUP = "webapp_backup.txt"
 
 
 def clear_backup():
-    open(BACKUP, 'w').close()
+	open(BACKUP, 'w').close()
 
 
 @app.route("/")
 def start():
-    return redirect(url_for('auth'), code=302)
+	return redirect(url_for('auth'), code=302)
 
 
 @app.route("/auth")
 def auth():
-    return redirect(auth_url(conf.webapp_redirect), code=302)
+	return redirect(auth_url(conf.webapp_redirect), code=302)
 
 
 @app.route("/receive_code")
 def receive_code():
-    code = request.args.get('code')
+	code = request.args.get('code')
 
-    if code:
-        response = requests.get(f"{conf.url}/login?code={code}&webapp=True")
+	if code:
+		response = requests.get(f"{conf.url}/login?code={code}&webapp=True")
 
-        if response.status_code != 200:
-            return "Contacting main server failed", 400
+		if response.status_code != 200:
+			return "Contacting main server failed", 400
 
-        return redirect(url_for("start_playing"), code=302)
+		return redirect(url_for("start_playing"), code=302)
 
-    else:
-        return "Code parameter missing", 400
+	else:
+		return "Code parameter missing", 400
 
 
 @app.route("/start_playing", methods=['GET', 'POST'])
 def start_playing():
-    token = access_token()
+	token = access_token()
 
-    url = "https://api.spotify.com/v1/me/player/devices"
-    headers = {
-        'Authorization': "Bearer " + token
-    }
-    response = requests.get(url, headers=headers)
+	url = "https://api.spotify.com/v1/me/player/devices"
+	headers = {
+		'Authorization': "Bearer " + token
+	}
+	response = requests.get(url, headers=headers)
 
-    if response.status_code != 200:
-        return "Getting devices failed", 500
+	if response.status_code != 200:
+		return "Getting devices failed", 500
 
-    devices = response.json()['devices']
+	devices = response.json()['devices']
 
-    if not devices:
-        return "No available devices", 404
+	if not devices:
+		return "No available devices", 404
 
-    if request.method == 'POST':
-        if 'clear_cache' in request.form:
-            clear_backup()
-        load_backup(BACKUP)
-        create_queue()
-        set_playlist_id()
+	if request.method == 'POST':
+		if 'clear_cache' in request.form:
+			clear_backup()
+		load_backup(BACKUP)
+		create_queue()
+		set_playlist_id()
 
-        device_id = request.form['device_id']
-        set_device_id(device_id)
+		device_id = request.form['device_id']
+		set_device_id(device_id)
 
-        start_playback()
-        toggle_shuffle()
+		start_playback()
+		toggle_shuffle()
 
 
-        thread = threading.Thread(target=player_loop)
-        thread.start()
+		thread = threading.Thread(target=player_loop)
+		thread.start()
 
-        return redirect(url_for('control_playback'), code=302)
+		return redirect(url_for('control_playback'), code=302)
 
-    return render_template('choose_device.html', devices=devices, enumerate=enumerate)
+	return render_template('choose_device.html', devices=devices, enumerate=enumerate)
 
 
 @app.route("/control_playback", methods=['GET'])
 def control_playback():
-    return render_template('control_playback.html')
+	return render_template('control_playback.html')
 
 
 @app.route("/stop_playback", methods=['POST'])
 def stop_playback():
-    stop_player()
-    return "Playback stopped successfully"
+	stop_player()
+	return "Playback stopped successfully"
 
 
 if __name__ == '__main__':
-    serve(app, host="0.0.0.0", port=5000)
+	serve(app, host="0.0.0.0", port=5000)
 

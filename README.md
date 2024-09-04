@@ -48,8 +48,16 @@ To stop the controller
 
 - Test in a live setting
 
-- Make it easier to remove queued tracks
-
 - Consider a better default behaviour, than playing Fireball on repeat
 
+- Fuck der er dårlig responstid (skyldes muligvis lort eduroam)
+
 - Add exponential retry behaviour
+
+- Sange i kø-playlisten, men ikke i køen?
+
+- Undersøg følgende adfærd:
+	Ved opstart, spillede en sang i 10 sekunder, indtil den blev slettet fra playlisten.
+	Herefter blev en ny sang tilføjet til playlisten som spotify begyndte at spille i stedet.
+	Problemet blev fikset ved at tilføje endnu en sang til playlisten.
+	Idé: Spotify kan ikke lide man lytter til en tom playliste?
