@@ -360,6 +360,9 @@ def player_loop():
 				write_to_backup(cur_track)
 
 		if tracks_to_remove := [track for track in queue if (track_status.get(track, Status.QUEUED) >= Status.PLAYED and track.name != conf.default_track_name) or track_counter.get(track, 0) >= conf.max_track_count]:
+			while len(tracks_to_remove) >= len(queue):
+				# New Spotify behaviour doesn't like playing an empty playlist
+				tracks_to_remove.pop()
 			remove_tracks_from_playlist(queue_id, tracks_to_remove, token=token)
 
 		for track in queue:
